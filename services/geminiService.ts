@@ -2,13 +2,18 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
 export class GeminiService {
-  private ai: GoogleGenAI;
+  private ai: GoogleGenAI | null = null;
 
   constructor() {
-    this.ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+    // Safely check for process.env to avoid crashing in browser environments
+    const apiKey = typeof process !== 'undefined' ? process.env.API_KEY : undefined;
+    if (apiKey) {
+      this.ai = new GoogleGenAI({ apiKey });
+    }
   }
 
   async suggestSEO(content: string) {
+    if (!this.ai) return null;
     try {
       const response = await this.ai.models.generateContent({
         model: 'gemini-3-flash-preview',
@@ -25,7 +30,7 @@ export class GeminiService {
           }
         }
       });
-      return JSON.parse(response.text);
+      return JSON.parse(response.text || '{}');
     } catch (error) {
       console.error("Gemini Error:", error);
       return null;
@@ -33,6 +38,7 @@ export class GeminiService {
   }
 
   async generateDraft(topic: string) {
+    if (!this.ai) return null;
     try {
       const response = await this.ai.models.generateContent({
         model: 'gemini-3-flash-preview',
@@ -50,7 +56,7 @@ export class GeminiService {
           }
         }
       });
-      return JSON.parse(response.text);
+      return JSON.parse(response.text || '{}');
     } catch (error) {
       console.error("Gemini Error:", error);
       return null;
