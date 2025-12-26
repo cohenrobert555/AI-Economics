@@ -1,8 +1,8 @@
 
 import React, { useState, useRef } from 'react';
-import { AppState, Profile, SiteConfig, Skill } from '../types';
-import { Button, Card, Input, TextArea } from './ui';
-import { gemini } from '../services/geminiService';
+import { AppState, Profile, SiteConfig, Skill } from '../types.ts';
+import { Button, Card, Input, TextArea } from './ui.tsx';
+import { gemini } from '../services/geminiService.ts';
 
 interface AdminDashboardProps {
   state: AppState;
@@ -34,9 +34,31 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ state, onUpdateConfig, 
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result as string;
-        onUpdateProfile({ ...state.profile, imageUrl: base64String });
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          // 최대 너비 설정 (이미지 크기 최적화)
+          const MAX_WIDTH = 800;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > MAX_WIDTH) {
+            height = Math.round((height * MAX_WIDTH) / width);
+            width = MAX_WIDTH;
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height);
+            // 압축된 베이스64 문자열 생성 (품질 0.7)
+            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+            onUpdateProfile({ ...state.profile, imageUrl: compressedBase64 });
+          }
+        };
+        img.src = e.target?.result as string;
       };
       reader.readAsDataURL(file);
     }
