@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { MemoryRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
-import { AppState, SiteConfig, Profile } from './types.ts';
-import { DEFAULT_CONFIG, INITIAL_PROFILE } from './constants.tsx';
-import { Button, Card } from './components/ui.tsx';
-import AdminDashboard from './components/AdminDashboard.tsx';
+import { AppState, SiteConfig, Profile } from './types';
+import { DEFAULT_CONFIG, INITIAL_PROFILE } from './constants';
+import { Button, Card } from './components/ui';
+import AdminDashboard from './components/AdminDashboard';
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -303,7 +303,7 @@ export default function App() {
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [state, setState] = useState<AppState>(() => {
     try {
-      const saved = localStorage.getItem('ai_economics_state_cohen_v4');
+      const saved = localStorage.getItem('ai_economics_state_cohen_v3');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed.profile && parsed.config) return parsed;
@@ -316,7 +316,7 @@ export default function App() {
 
   useEffect(() => {
     try {
-      localStorage.setItem('ai_economics_state_cohen_v4', JSON.stringify(state));
+      localStorage.setItem('ai_economics_state_cohen_v3', JSON.stringify(state));
     } catch (e) {
       console.warn("Storage quota exceeded or unavailable", e);
     }

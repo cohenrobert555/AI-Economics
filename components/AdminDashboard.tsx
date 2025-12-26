@@ -1,8 +1,8 @@
 
 import React, { useState, useRef } from 'react';
-import { AppState, Profile, SiteConfig, Skill } from '../types.ts';
-import { Button, Card, Input, TextArea } from './ui.tsx';
-import { gemini } from '../services/geminiService.ts';
+import { AppState, Profile, SiteConfig, Skill } from '../types';
+import { Button, Card, Input, TextArea } from './ui';
+import { gemini } from '../services/geminiService';
 
 interface AdminDashboardProps {
   state: AppState;
