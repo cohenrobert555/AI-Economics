@@ -61,6 +61,141 @@ const Navbar: React.FC<{ siteName: string; onAdminToggle: () => void }> = ({ sit
   </nav>
 );
 
+const ContactView: React.FC = () => {
+  const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setStatus('submitting');
+    
+    const formData = new FormData(e.currentTarget);
+    
+    try {
+      const response = await fetch("https://formspree.io/f/xdaokrzk", {
+        method: "POST",
+        body: formData,
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        setStatus('success');
+      } else {
+        setStatus('error');
+      }
+    } catch (err) {
+      setStatus('error');
+    }
+  };
+
+  return (
+    <section className="pt-48 pb-32 px-6 max-w-4xl mx-auto min-h-screen">
+      <div className="text-center mb-16">
+        <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-indigo-500 mb-4">Strategic Inquiry</h2>
+        <h1 className="text-4xl md:text-6xl font-brand font-black text-white tracking-tighter">Let's redefine your AI trajectory.</h1>
+      </div>
+
+      {status === 'success' ? (
+        <Card className="p-16 bg-zinc-900/60 border-indigo-500/50 text-center animate-in fade-in zoom-in duration-500">
+          <div className="w-20 h-20 bg-indigo-600/20 rounded-full flex items-center justify-center mx-auto mb-8 border border-indigo-500/30">
+            <svg className="w-10 h-10 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-brand font-black text-white mb-4 uppercase tracking-widest">Inquiry Received</h2>
+          <p className="text-gray-400 mb-10 max-w-md mx-auto leading-relaxed">
+            Your brief has been securely transmitted. Dr. Cohen's strategic advisory team will review the parameters and respond within 24 business hours.
+          </p>
+          <Button onClick={() => setStatus('idle')} variant="outline">New Intelligence Request</Button>
+        </Card>
+      ) : (
+        <Card className="p-10 md:p-12 bg-zinc-900/60 border-white/5 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-600/5 blur-3xl rounded-full" />
+          
+          <form onSubmit={handleSubmit} className="space-y-8 relative z-10">
+            <div className="grid md:grid-cols-2 gap-8">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest block">Full Name</label>
+                <input 
+                  required
+                  name="name"
+                  type="text" 
+                  disabled={status === 'submitting'}
+                  className="w-full bg-black/40 border border-white/10 rounded-sm p-4 text-white focus:border-indigo-500 outline-none transition-all disabled:opacity-50" 
+                  placeholder="e.g. Marcus Aurelius" 
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest block">Professional Email</label>
+                <input 
+                  required
+                  name="email"
+                  type="email" 
+                  disabled={status === 'submitting'}
+                  className="w-full bg-black/40 border border-white/10 rounded-sm p-4 text-white focus:border-indigo-500 outline-none transition-all disabled:opacity-50" 
+                  placeholder="executive@company.ai" 
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest block">Organization</label>
+              <input 
+                name="organization"
+                type="text" 
+                disabled={status === 'submitting'}
+                className="w-full bg-black/40 border border-white/10 rounded-sm p-4 text-white focus:border-indigo-500 outline-none transition-all disabled:opacity-50" 
+                placeholder="Global Enterprise Name" 
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest block">Strategic Brief / Inquiry</label>
+              <textarea 
+                required
+                name="message"
+                disabled={status === 'submitting'}
+                className="w-full bg-black/40 border border-white/10 rounded-sm p-4 text-white focus:border-indigo-500 outline-none transition-all min-h-[150px] disabled:opacity-50" 
+                placeholder="Briefly describe the AI economic challenges or ROI modeling needs of your organization..."
+              ></textarea>
+            </div>
+
+            <Button 
+              type="submit"
+              disabled={status === 'submitting'}
+              className="w-full py-5 text-lg font-brand tracking-[0.2em] shadow-indigo-500/20 shadow-2xl"
+            >
+              {status === 'submitting' ? 'Transmitting Intelligence...' : 'Initialize Consultation Request'}
+            </Button>
+
+            {status === 'error' && (
+              <div className="p-4 bg-red-900/20 border border-red-500/30 rounded-sm text-center">
+                <p className="text-red-400 text-[10px] font-black uppercase tracking-widest">Transmission failed. Please check your network or contact info@aieconomics.ai directly.</p>
+              </div>
+            )}
+          </form>
+        </Card>
+      )}
+
+      <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+        <div>
+          <h4 className="text-[10px] font-black text-indigo-500 uppercase tracking-widest mb-2">Direct Contact</h4>
+          <p className="text-gray-400 text-sm">info@aieconomics.ai</p>
+        </div>
+        <div>
+          <h4 className="text-[10px] font-black text-indigo-500 uppercase tracking-widest mb-2">Primary Office</h4>
+          <p className="text-gray-400 text-sm">New York City, NY</p>
+        </div>
+        <div>
+          <h4 className="text-[10px] font-black text-indigo-500 uppercase tracking-widest mb-2">Availability</h4>
+          <p className="text-gray-400 text-sm">Mon - Fri, 09:00 - 18:00 EST</p>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 const ProfileView: React.FC<{ profile: Profile }> = ({ profile }) => (
   <section className="pt-48 pb-32 px-6 max-w-7xl mx-auto">
     <div className="grid lg:grid-cols-[1fr_2.5fr] gap-20 items-start">
@@ -170,7 +305,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<main><Hero config={state.config} /></main>} />
           <Route path="/profile" element={<ProfileView profile={state.profile} />} />
-          <Route path="/contact" element={<div className="pt-48 px-6 max-w-2xl mx-auto text-center"><h1 className="text-4xl font-brand font-black mb-8">Consultation Inquiry</h1><p className="text-gray-400 leading-relaxed">Please contact info@aieconomics.ai for strategic advisory requests.</p></div>} />
+          <Route path="/contact" element={<ContactView />} />
         </Routes>
       </div>
     </Router>
