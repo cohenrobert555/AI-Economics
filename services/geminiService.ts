@@ -1,21 +1,14 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
 
+// Always initialize the client using the environment variable as per coding guidelines
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
 export class GeminiService {
-  private ai: GoogleGenAI | null = null;
-
-  constructor() {
-    // Safely check for process.env to avoid crashing in browser environments
-    const apiKey = typeof process !== 'undefined' ? process.env.API_KEY : undefined;
-    if (apiKey) {
-      this.ai = new GoogleGenAI({ apiKey });
-    }
-  }
-
   async suggestSEO(content: string) {
-    if (!this.ai) return null;
     try {
-      const response = await this.ai.models.generateContent({
+      // Use ai.models.generateContent directly with model name and prompt
+      const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
         contents: `Given the following content, suggest 5 highly relevant SEO keywords and a 160-character meta description. Content: ${content}`,
         config: {
@@ -30,6 +23,7 @@ export class GeminiService {
           }
         }
       });
+      // Access text property directly as it is a getter
       return JSON.parse(response.text || '{}');
     } catch (error) {
       console.error("Gemini Error:", error);
@@ -38,9 +32,9 @@ export class GeminiService {
   }
 
   async generateDraft(topic: string) {
-    if (!this.ai) return null;
     try {
-      const response = await this.ai.models.generateContent({
+      // Use ai.models.generateContent directly with model name and prompt
+      const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
         contents: `Write a short professional economic consulting blog post about: ${topic}. Include a title and a 3-sentence excerpt.`,
         config: {
@@ -56,6 +50,7 @@ export class GeminiService {
           }
         }
       });
+      // Access text property directly as it is a getter
       return JSON.parse(response.text || '{}');
     } catch (error) {
       console.error("Gemini Error:", error);

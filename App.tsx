@@ -99,7 +99,7 @@ const ProfileView: React.FC<{ profile: Profile }> = ({ profile }) => (
           ))}
         </div>
         <div className="mt-12 space-y-4">
-           <a href="mailto:bcohen@bway.net" className="block">
+           <a href="mailto:info@aieconomics.ai" className="block">
              <Button className="w-full text-[10px] tracking-[0.2em] bg-indigo-600">Contact Dr. Cohen</Button>
            </a>
         </div>
@@ -175,35 +175,110 @@ const Hero: React.FC<{ config: SiteConfig }> = ({ config }) => (
   </section>
 );
 
-const ContactView = () => (
-  <section className="pt-48 pb-32 px-6 max-w-4xl mx-auto min-h-screen">
-    <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-500 mb-8 border-l-2 border-indigo-500 pl-4">Strategic Inquiry</h2>
-    <h1 className="text-4xl md:text-6xl font-brand font-black text-white mb-12 tracking-tight">Let's redefine your AI trajectory.</h1>
-    <Card className="p-10 bg-zinc-900/60 border-white/5">
-      <form className="space-y-6">
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Name</label>
-            <input type="text" className="w-full bg-black border border-white/10 rounded-lg p-4 text-white focus:border-indigo-500 outline-none transition-colors" placeholder="Full Name" />
-          </div>
-          <div className="space-y-2">
-            <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Email</label>
-            <input type="email" className="w-full bg-black border border-white/10 rounded-lg p-4 text-white focus:border-indigo-500 outline-none transition-colors" placeholder="email@company.com" />
-          </div>
-        </div>
-        <div className="space-y-2">
-          <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Organization</label>
-          <input type="text" className="w-full bg-black border border-white/10 rounded-lg p-4 text-white focus:border-indigo-500 outline-none transition-colors" placeholder="Company Name" />
-        </div>
-        <div className="space-y-2">
-          <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Inquiry Brief</label>
-          <textarea className="w-full bg-black border border-white/10 rounded-lg p-4 text-white focus:border-indigo-500 outline-none transition-colors min-h-[150px]" placeholder="Describe your strategic requirements..."></textarea>
-        </div>
-        <Button className="w-full py-5 text-lg">Send Intelligence Request</Button>
-      </form>
-    </Card>
-  </section>
-);
+const ContactView: React.FC = () => {
+  const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setStatus('submitting');
+    
+    const formData = new FormData(e.currentTarget);
+    
+    try {
+      const response = await fetch("https://formspree.io/f/xdaokrzk", {
+        method: "POST",
+        body: formData,
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        setStatus('success');
+        (e.target as HTMLFormElement).reset();
+      } else {
+        setStatus('error');
+      }
+    } catch (err) {
+      setStatus('error');
+    }
+  };
+
+  return (
+    <section className="pt-48 pb-32 px-6 max-w-4xl mx-auto min-h-screen">
+      <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-500 mb-8 border-l-2 border-indigo-500 pl-4">Strategic Inquiry</h2>
+      <h1 className="text-4xl md:text-6xl font-brand font-black text-white mb-12 tracking-tight">Let's redefine your AI trajectory.</h1>
+      
+      {status === 'success' ? (
+        <Card className="p-10 bg-zinc-900/60 border-indigo-500/50 text-center animate-in fade-in zoom-in duration-500">
+          <div className="text-indigo-400 text-6xl mb-6">✓</div>
+          <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-widest">Inquiry Received</h2>
+          <p className="text-gray-400 mb-8 max-w-md mx-auto leading-relaxed">Thank you for your interest. Dr. Cohen's strategic team will review your inquiry and reach out within 24 business hours.</p>
+          <Button onClick={() => setStatus('idle')}>New Intelligence Request</Button>
+        </Card>
+      ) : (
+        <Card className="p-10 bg-zinc-900/60 border-white/5">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Name</label>
+                <input 
+                  required
+                  name="name"
+                  type="text" 
+                  disabled={status === 'submitting'}
+                  className="w-full bg-black border border-white/10 rounded-lg p-4 text-white focus:border-indigo-500 outline-none transition-colors disabled:opacity-50" 
+                  placeholder="Full Name" 
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Email</label>
+                <input 
+                  required
+                  name="email"
+                  type="email" 
+                  disabled={status === 'submitting'}
+                  className="w-full bg-black border border-white/10 rounded-lg p-4 text-white focus:border-indigo-500 outline-none transition-colors disabled:opacity-50" 
+                  placeholder="email@company.com" 
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Organization</label>
+              <input 
+                name="organization"
+                type="text" 
+                disabled={status === 'submitting'}
+                className="w-full bg-black border border-white/10 rounded-lg p-4 text-white focus:border-indigo-500 outline-none transition-colors disabled:opacity-50" 
+                placeholder="Company Name" 
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Inquiry Brief</label>
+              <textarea 
+                required
+                name="message"
+                disabled={status === 'submitting'}
+                className="w-full bg-black border border-white/10 rounded-lg p-4 text-white focus:border-indigo-500 outline-none transition-colors min-h-[150px] disabled:opacity-50" 
+                placeholder="Describe your strategic requirements..."
+              ></textarea>
+            </div>
+            <Button 
+              type="submit"
+              disabled={status === 'submitting'}
+              className="w-full py-5 text-lg"
+            >
+              {status === 'submitting' ? 'Transmitting...' : 'Send Intelligence Request'}
+            </Button>
+            {status === 'error' && (
+              <p className="text-red-400 text-xs text-center mt-4 uppercase tracking-widest font-bold">Transmission failed. Please try again or contact info@aieconomics.ai.</p>
+            )}
+          </form>
+        </Card>
+      )}
+    </section>
+  );
+};
 
 const Footer: React.FC<{ siteName: string }> = ({ siteName }) => (
   <footer className="border-t border-white/5 py-20 mt-20 bg-zinc-950">
@@ -231,7 +306,6 @@ export default function App() {
       const saved = localStorage.getItem('ai_economics_state_cohen_v3');
       if (saved) {
         const parsed = JSON.parse(saved);
-        // Basic validation to ensure we don't load corrupt objects
         if (parsed.profile && parsed.config) return parsed;
       }
     } catch (e) {

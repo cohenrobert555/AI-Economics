@@ -7,8 +7,10 @@ export const Button: React.FC<{
   className?: string;
   variant?: 'primary' | 'outline' | 'ghost';
   type?: 'button' | 'submit';
-}> = ({ children, onClick, className = "", variant = 'primary', type = 'button' }) => {
-  const base = "px-6 py-3 rounded-md font-bold text-sm tracking-widest uppercase transition-all duration-500 active:scale-95";
+  // Add disabled prop to resolve the type error in App.tsx
+  disabled?: boolean;
+}> = ({ children, onClick, className = "", variant = 'primary', type = 'button', disabled = false }) => {
+  const base = "px-6 py-3 rounded-md font-bold text-sm tracking-widest uppercase transition-all duration-500 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed";
   const styles = {
     primary: "bg-indigo-600 text-white hover:bg-indigo-500 shadow-[0_0_20px_rgba(79,70,229,0.3)] hover:shadow-[0_0_30px_rgba(79,70,229,0.5)]",
     outline: "border border-white/20 text-white hover:border-white hover:bg-white/5",
@@ -16,7 +18,12 @@ export const Button: React.FC<{
   };
   
   return (
-    <button type={type} onClick={onClick} className={`${base} ${styles[variant]} ${className}`}>
+    <button 
+      type={type} 
+      onClick={onClick} 
+      disabled={disabled}
+      className={`${base} ${styles[variant]} ${className}`}
+    >
       {children}
     </button>
   );
