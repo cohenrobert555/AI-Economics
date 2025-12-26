@@ -35,16 +35,24 @@ export const Card: React.FC<{ children: React.ReactNode; className?: string }> =
   </div>
 );
 
-export const Input: React.FC<React.InputHTMLAttributes<HTMLInputElement>> = (props) => (
-  <input 
-    {...props} 
-    className="w-full bg-black border border-white/10 rounded-sm px-4 py-3 text-white focus:outline-none focus:border-indigo-500 transition-all text-sm"
-  />
+// Added label support to Input to resolve type errors in AdminDashboard.tsx
+export const Input: React.FC<React.InputHTMLAttributes<HTMLInputElement> & { label?: string }> = ({ label, ...props }) => (
+  <div className="w-full">
+    {label && <label className="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-2">{label}</label>}
+    <input 
+      {...props} 
+      className="w-full bg-black border border-white/10 rounded-sm px-4 py-3 text-white focus:outline-none focus:border-indigo-500 transition-all text-sm"
+    />
+  </div>
 );
 
-export const TextArea: React.FC<React.TextareaHTMLAttributes<HTMLTextAreaElement>> = (props) => (
-  <textarea 
-    {...props} 
-    className="w-full bg-black border border-white/10 rounded-sm px-4 py-3 text-white focus:outline-none focus:border-indigo-500 transition-all min-h-[100px] text-sm"
-  />
+// Added label support to TextArea to resolve type errors in AdminDashboard.tsx
+export const TextArea: React.FC<React.TextareaHTMLAttributes<HTMLTextAreaElement> & { label?: string }> = ({ label, ...props }) => (
+  <div className="w-full">
+    {label && <label className="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-2">{label}</label>}
+    <textarea 
+      {...props} 
+      className="w-full bg-black border border-white/10 rounded-sm px-4 py-3 text-white focus:outline-none focus:border-indigo-500 transition-all min-h-[100px] text-sm"
+    />
+  </div>
 );
