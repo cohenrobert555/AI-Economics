@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { MemoryRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
-import { AppState, SiteConfig, Profile } from './types';
-import { DEFAULT_CONFIG, INITIAL_PROFILE } from './constants';
-import { Button, Card } from './components/ui';
-import AdminDashboard from './components/AdminDashboard';
+import { AppState, SiteConfig, Profile } from './types.ts';
+import { DEFAULT_CONFIG, INITIAL_PROFILE } from './constants.tsx';
+import { Button, Card } from './components/ui.tsx';
+import AdminDashboard from './components/AdminDashboard.tsx';
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -303,7 +303,6 @@ export default function App() {
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [state, setState] = useState<AppState>(() => {
     try {
-      // Incremented key to v4 to ensure the corrected email is loaded from constants instead of old cache
       const saved = localStorage.getItem('ai_economics_state_cohen_v4');
       if (saved) {
         const parsed = JSON.parse(saved);
