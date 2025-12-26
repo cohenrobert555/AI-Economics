@@ -303,7 +303,8 @@ export default function App() {
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [state, setState] = useState<AppState>(() => {
     try {
-      const saved = localStorage.getItem('ai_economics_state_cohen_v3');
+      // Incremented key to v4 to ensure the corrected email is loaded from constants instead of old cache
+      const saved = localStorage.getItem('ai_economics_state_cohen_v4');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed.profile && parsed.config) return parsed;
@@ -316,7 +317,7 @@ export default function App() {
 
   useEffect(() => {
     try {
-      localStorage.setItem('ai_economics_state_cohen_v3', JSON.stringify(state));
+      localStorage.setItem('ai_economics_state_cohen_v4', JSON.stringify(state));
     } catch (e) {
       console.warn("Storage quota exceeded or unavailable", e);
     }
