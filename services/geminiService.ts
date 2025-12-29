@@ -1,13 +1,16 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
 
-// Always initialize the client using the environment variable as per coding guidelines
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 export class GeminiService {
+  private getClient() {
+    // window.process를 통해 안전하게 API 키 접근
+    const apiKey = (window as any).process?.env?.API_KEY || "";
+    return new GoogleGenAI({ apiKey });
+  }
+
   async suggestSEO(content: string) {
     try {
-      // Use ai.models.generateContent directly with model name and prompt
+      const ai = this.getClient();
       const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
         contents: `Given the following content, suggest 5 highly relevant SEO keywords and a 160-character meta description. Content: ${content}`,
@@ -23,7 +26,6 @@ export class GeminiService {
           }
         }
       });
-      // Access text property directly as it is a getter
       return JSON.parse(response.text || '{}');
     } catch (error) {
       console.error("Gemini Error:", error);
@@ -33,10 +35,10 @@ export class GeminiService {
 
   async generateDraft(topic: string) {
     try {
-      // Use ai.models.generateContent directly with model name and prompt
+      const ai = this.getClient();
       const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
-        contents: `Write a short professional economic consulting blog post about: ${topic}. Include a title and a 3-sentence excerpt.`,
+        contents: `Write a short professional economic consulting bio or summary about: ${topic}. Format as a clear narrative.`,
         config: {
           responseMimeType: 'application/json',
           responseSchema: {
@@ -50,7 +52,6 @@ export class GeminiService {
           }
         }
       });
-      // Access text property directly as it is a getter
       return JSON.parse(response.text || '{}');
     } catch (error) {
       console.error("Gemini Error:", error);

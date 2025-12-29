@@ -9,7 +9,12 @@ import AdminDashboard from './components/AdminDashboard.tsx';
 const ScrollToTop = () => {
   const { pathname } = useLocation();
   useEffect(() => {
-    window.scrollTo(0, 0);
+    // 보안 환경에 따라 window.scrollTo가 제한될 수 있으므로 try-catch 처리
+    try {
+      window.scrollTo(0, 0);
+    } catch (e) {
+      console.warn("ScrollToTop failed:", e);
+    }
   }, [pathname]);
   return null;
 };
@@ -35,31 +40,34 @@ const BrandLogo: React.FC<{ size?: number; className?: string }> = ({ size = 32,
   </svg>
 );
 
-const Navbar: React.FC<{ siteName: string; onAdminToggle: () => void }> = ({ siteName, onAdminToggle }) => (
-  <nav className="fixed top-0 w-full z-40 bg-black/80 backdrop-blur-xl border-b border-white/5">
-    <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-      <Link to="/" className="flex items-center gap-3 group">
-        <BrandLogo size={40} className="group-hover:rotate-12 transition-transform duration-500" />
-        <span className="text-2xl font-brand font-extrabold tracking-tighter text-white">
-          {siteName?.split(' ')[0] || "AI"}<span className="text-indigo-400">{siteName?.split(' ')[1] || "ECONOMICS"}</span>
-        </span>
-      </Link>
-      <div className="hidden md:flex space-x-12 text-xs font-bold uppercase tracking-[0.2em] text-gray-400">
-        <Link to="/" className="hover:text-white transition-colors">Strategic Ops</Link>
-        <Link to="/profile" className="hover:text-white transition-colors">Expert Profile</Link>
-        <Link to="/contact" className="hover:text-white transition-colors">Inquiry</Link>
-      </div>
-      <div className="flex items-center gap-4">
-        <button onClick={onAdminToggle} className="p-2 text-gray-500 hover:text-white transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        </button>
-        <Link to="/contact">
-          <Button className="hidden sm:block">Work with Us</Button>
+const Navbar: React.FC<{ siteName: string; onAdminToggle: () => void }> = ({ siteName, onAdminToggle }) => {
+  const words = siteName?.split(' ') || ["AI", "ECONOMICS"];
+  return (
+    <nav className="fixed top-0 w-full z-40 bg-black/80 backdrop-blur-xl border-b border-white/5">
+      <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+        <Link to="/" className="flex items-center gap-3 group">
+          <BrandLogo size={40} className="group-hover:rotate-12 transition-transform duration-500" />
+          <span className="text-2xl font-brand font-extrabold tracking-tighter text-white">
+            {words[0]}<span className="text-indigo-400"> {words.slice(1).join(' ')}</span>
+          </span>
         </Link>
+        <div className="hidden md:flex space-x-12 text-xs font-bold uppercase tracking-[0.2em] text-gray-400">
+          <Link to="/" className="hover:text-white transition-colors">Strategic Ops</Link>
+          <Link to="/profile" className="hover:text-white transition-colors">Expert Profile</Link>
+          <Link to="/contact" className="hover:text-white transition-colors">Inquiry</Link>
+        </div>
+        <div className="flex items-center gap-4">
+          <button onClick={onAdminToggle} className="p-2 text-gray-500 hover:text-white transition-colors focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </button>
+          <Link to="/contact">
+            <Button className="hidden sm:block">Work with Us</Button>
+          </Link>
+        </div>
       </div>
-    </div>
-  </nav>
-);
+    </nav>
+  );
+};
 
 const ContactView: React.FC = () => {
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
@@ -67,137 +75,70 @@ const ContactView: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setStatus('submitting');
-    
     const formData = new FormData(e.currentTarget);
-    
     try {
       const response = await fetch("https://formspree.io/f/xdaokrzk", {
         method: "POST",
         body: formData,
-        headers: {
-          'Accept': 'application/json'
-        }
+        headers: { 'Accept': 'application/json' }
       });
-      
-      if (response.ok) {
-        setStatus('success');
-      } else {
-        setStatus('error');
-      }
-    } catch (err) {
-      setStatus('error');
+      if (response.ok) setStatus('success');
+      else setStatus('error');
+    } catch (err) { 
+      console.error("Submission error:", err);
+      setStatus('error'); 
     }
   };
 
   return (
     <section className="pt-48 pb-32 px-6 max-w-4xl mx-auto min-h-screen">
-      <div className="text-center mb-16">
+      <div className="text-center mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
         <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-indigo-500 mb-4">Strategic Inquiry</h2>
         <h1 className="text-4xl md:text-6xl font-brand font-black text-white tracking-tighter">Let's redefine your AI trajectory.</h1>
       </div>
-
       {status === 'success' ? (
         <Card className="p-16 bg-zinc-900/60 border-indigo-500/50 text-center animate-in fade-in zoom-in duration-500">
           <div className="w-20 h-20 bg-indigo-600/20 rounded-full flex items-center justify-center mx-auto mb-8 border border-indigo-500/30">
-            <svg className="w-10 h-10 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-            </svg>
+            <svg className="w-10 h-10 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
           </div>
           <h2 className="text-2xl font-brand font-black text-white mb-4 uppercase tracking-widest">Inquiry Received</h2>
-          <p className="text-gray-400 mb-10 max-w-md mx-auto leading-relaxed">
-            Your brief has been securely transmitted. Dr. Cohen's strategic advisory team will review the parameters and respond within 24 business hours.
-          </p>
-          <Button onClick={() => setStatus('idle')} variant="outline">New Intelligence Request</Button>
+          <p className="text-gray-400 mb-10 max-w-md mx-auto">Your brief has been securely transmitted. Our team will review and respond within 24 business hours.</p>
+          <Button onClick={() => setStatus('idle')} variant="outline">New Inquiry</Button>
         </Card>
       ) : (
-        <Card className="p-10 md:p-12 bg-zinc-900/60 border-white/5 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-600/5 blur-3xl rounded-full" />
-          
+        <Card className="p-8 md:p-12 bg-zinc-900/60 border-white/5 relative overflow-hidden">
           <form onSubmit={handleSubmit} className="space-y-8 relative z-10">
             <div className="grid md:grid-cols-2 gap-8">
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest block">Full Name</label>
-                <input 
-                  required
-                  name="name"
-                  type="text" 
-                  disabled={status === 'submitting'}
-                  className="w-full bg-black/40 border border-white/10 rounded-sm p-4 text-white focus:border-indigo-500 outline-none transition-all disabled:opacity-50" 
-                  placeholder="e.g. Marcus Aurelius" 
-                />
+                <input required name="name" type="text" disabled={status === 'submitting'} className="w-full bg-black/40 border border-white/10 rounded-sm p-4 text-white focus:border-indigo-500 outline-none transition-all disabled:opacity-50" />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest block">Professional Email</label>
-                <input 
-                  required
-                  name="email"
-                  type="email" 
-                  disabled={status === 'submitting'}
-                  className="w-full bg-black/40 border border-white/10 rounded-sm p-4 text-white focus:border-indigo-500 outline-none transition-all disabled:opacity-50" 
-                  placeholder="executive@company.ai" 
-                />
+                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest block">Email</label>
+                <input required name="email" type="email" disabled={status === 'submitting'} className="w-full bg-black/40 border border-white/10 rounded-sm p-4 text-white focus:border-indigo-500 outline-none transition-all disabled:opacity-50" />
               </div>
             </div>
-
             <div className="space-y-2">
               <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest block">Organization</label>
-              <input 
-                name="organization"
-                type="text" 
-                disabled={status === 'submitting'}
-                className="w-full bg-black/40 border border-white/10 rounded-sm p-4 text-white focus:border-indigo-500 outline-none transition-all disabled:opacity-50" 
-                placeholder="Global Enterprise Name" 
-              />
+              <input name="organization" type="text" disabled={status === 'submitting'} className="w-full bg-black/40 border border-white/10 rounded-sm p-4 text-white focus:border-indigo-500 outline-none transition-all disabled:opacity-50" />
             </div>
-
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest block">Strategic Brief / Inquiry</label>
-              <textarea 
-                required
-                name="message"
-                disabled={status === 'submitting'}
-                className="w-full bg-black/40 border border-white/10 rounded-sm p-4 text-white focus:border-indigo-500 outline-none transition-all min-h-[150px] disabled:opacity-50" 
-                placeholder="Briefly describe the AI economic challenges or ROI modeling needs of your organization..."
-              ></textarea>
+              <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest block">Strategic Brief</label>
+              <textarea required name="message" disabled={status === 'submitting'} className="w-full bg-black/40 border border-white/10 rounded-sm p-4 text-white focus:border-indigo-500 outline-none transition-all min-h-[150px] disabled:opacity-50"></textarea>
             </div>
-
-            <Button 
-              type="submit"
-              disabled={status === 'submitting'}
-              className="w-full py-5 text-lg font-brand tracking-[0.2em] shadow-indigo-500/20 shadow-2xl"
-            >
-              {status === 'submitting' ? 'Transmitting Intelligence...' : 'Initialize Consultation Request'}
+            <Button type="submit" disabled={status === 'submitting'} className="w-full py-5 text-lg">
+              {status === 'submitting' ? 'Transmitting...' : 'Initialize Consultation'}
             </Button>
-
-            {status === 'error' && (
-              <div className="p-4 bg-red-900/20 border border-red-500/30 rounded-sm text-center">
-                <p className="text-red-400 text-[10px] font-black uppercase tracking-widest">Transmission failed. Please check your network or contact info@aieconomics.ai directly.</p>
-              </div>
-            )}
+            {status === 'error' && <p className="text-red-400 text-center text-xs uppercase font-black">Transmission failed. Please try again.</p>}
           </form>
         </Card>
       )}
-
-      <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-        <div>
-          <h4 className="text-[10px] font-black text-indigo-500 uppercase tracking-widest mb-2">Direct Contact</h4>
-          <p className="text-gray-400 text-sm">info@aieconomics.ai</p>
-        </div>
-        <div>
-          <h4 className="text-[10px] font-black text-indigo-500 uppercase tracking-widest mb-2">Primary Office</h4>
-          <p className="text-gray-400 text-sm">New York City, NY</p>
-        </div>
-        <div>
-          <h4 className="text-[10px] font-black text-indigo-500 uppercase tracking-widest mb-2">Availability</h4>
-          <p className="text-gray-400 text-sm">Mon - Fri, 09:00 - 18:00 EST</p>
-        </div>
-      </div>
     </section>
   );
 };
 
 const ProfileView: React.FC<{ profile: Profile }> = ({ profile }) => (
-  <section className="pt-48 pb-32 px-6 max-w-7xl mx-auto">
+  <section className="pt-48 pb-32 px-6 max-w-7xl mx-auto animate-in fade-in duration-1000">
     <div className="grid lg:grid-cols-[1fr_2.5fr] gap-20 items-start">
       <aside className="lg:sticky lg:top-48">
         <div className="relative mb-10 w-full group">
@@ -208,9 +149,8 @@ const ProfileView: React.FC<{ profile: Profile }> = ({ profile }) => (
         </div>
         <h1 className="text-3xl font-brand font-black text-white mb-2 leading-tight">{profile?.name}</h1>
         <p className="text-indigo-400 font-bold uppercase tracking-widest text-[10px] mb-8">{profile?.title}</p>
-        
         <div className="space-y-8">
-          <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 border-b border-white/5 pb-2 text-center md:text-left">Technical Mastery</h3>
+          <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 border-b border-white/5 pb-2">Technical Mastery</h3>
           {profile?.skills?.map((skill, i) => (
             <div key={i}>
               <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">
@@ -218,19 +158,17 @@ const ProfileView: React.FC<{ profile: Profile }> = ({ profile }) => (
                 <span>{skill.level}%</span>
               </div>
               <div className="h-1 w-full bg-white/5 overflow-hidden rounded-full">
-                <div className="h-full bg-gradient-to-r from-indigo-600 to-purple-500 transition-all duration-1000 shadow-[0_0_10px_rgba(79,70,229,0.5)]" style={{ width: `${skill.level}%` }} />
+                <div className="h-full bg-gradient-to-r from-indigo-600 to-purple-500 transition-all duration-1000" style={{ width: `${skill.level}%` }} />
               </div>
             </div>
           ))}
         </div>
       </aside>
-
       <div className="space-y-16">
         <div>
           <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-500 mb-8 border-l-2 border-indigo-500 pl-4">Executive Brief</h2>
           <p className="text-2xl md:text-4xl text-white font-medium leading-[1.3] mb-12">{profile?.bio}</p>
         </div>
-
         <div className="grid md:grid-cols-2 gap-8">
           {profile?.detailedSections?.map((section, i) => (
             <Card key={i} className="p-10 border-white/5 hover:border-indigo-500/20 transition-all group bg-zinc-900/40">
@@ -242,64 +180,98 @@ const ProfileView: React.FC<{ profile: Profile }> = ({ profile }) => (
             </Card>
           ))}
         </div>
-
-        <div className="animate-in fade-in duration-1000">
-          <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-500 mb-10 border-l-2 border-indigo-500 pl-4">Strategic Milestones</h2>
-          <div className="grid gap-4">
-            {profile?.achievements?.map((item, i) => (
-              <div key={i} className="flex gap-8 items-center p-6 bg-white/5 border border-white/5 rounded-xl group hover:bg-indigo-500/10 hover:border-indigo-500/20 transition-all duration-300">
-                <span className="text-indigo-500 font-black text-2xl opacity-40 group-hover:opacity-100">0{i + 1}</span>
-                <p className="text-white text-base font-medium leading-snug">{item}</p>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
     </div>
   </section>
 );
 
-const Hero: React.FC<{ config: SiteConfig }> = ({ config }) => (
-  <section className="relative pt-48 pb-32 overflow-hidden">
-    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-600/10 blur-[150px] rounded-full -z-10 animate-pulse" />
-    <div className="max-w-7xl mx-auto px-6 relative">
-      <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-[10px] font-black tracking-[0.3em] uppercase">
-        <span className="w-2 h-2 rounded-full bg-indigo-400 animate-ping" />
-        {config?.tagline || "Strategic AI Consulting"}
+const Hero: React.FC<{ config: SiteConfig }> = ({ config }) => {
+  const headingParts = config?.heroHeading?.split('ROI') || [config?.heroHeading || "ROI Strategy"];
+  return (
+    <section className="relative pt-48 pb-32 overflow-hidden">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-600/10 blur-[150px] rounded-full -z-10 animate-pulse" />
+      <div className="max-w-7xl mx-auto px-6 relative animate-in fade-in slide-in-from-bottom-8 duration-1000">
+        <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-[10px] font-black tracking-[0.3em] uppercase">
+          <span className="w-2 h-2 rounded-full bg-indigo-400 animate-ping" />
+          {config?.tagline}
+        </div>
+        <h1 className="text-5xl md:text-8xl font-brand font-black text-white mb-8 leading-[1.1] tracking-tight max-w-5xl">
+          {headingParts[0]}
+          {headingParts.length > 1 && <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">ROI</span>}
+          {headingParts.slice(1).join('ROI')}
+        </h1>
+        <p className="text-xl md:text-2xl text-gray-400 mb-12 max-w-3xl leading-relaxed">{config?.heroSubheading}</p>
+        <div className="flex flex-col sm:flex-row gap-5">
+          <Link to="/profile"><Button className="px-12 py-5 text-lg">View Expert Profile</Button></Link>
+          <Link to="/contact"><Button variant="outline" className="px-12 py-5 text-lg">Strategic Inquiry</Button></Link>
+        </div>
       </div>
-      <h1 className="text-5xl md:text-8xl font-brand font-black text-white mb-8 leading-[1.1] tracking-tight max-w-5xl">
-        Decoding the <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">Economic</span> ROI of AI
-      </h1>
-      <p className="text-xl md:text-2xl text-gray-400 mb-12 max-w-3xl leading-relaxed">{config?.heroSubheading}</p>
-      <div className="flex flex-col sm:flex-row gap-5">
-        <Link to="/profile"><Button className="px-12 py-5 text-lg">View Profile</Button></Link>
-        <Link to="/contact"><Button variant="outline" className="px-12 py-5 text-lg">Inquiry</Button></Link>
-      </div>
-    </div>
-  </section>
+    </section>
+  );
+};
+
+const BackgroundLayer: React.FC = () => (
+  <div className="fixed inset-0 -z-50 pointer-events-none overflow-hidden">
+    <div className="absolute inset-0 bg-[#020205]" />
+    <div 
+      className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000"
+      style={{ 
+        backgroundImage: 'url("https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop")',
+        opacity: 0.1
+      }} 
+    />
+    <div className="absolute inset-0 bg-gradient-to-b from-[#020205] via-[#020205]/90 to-[#020205]" />
+    <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(79,70,229,0.03)_0%,transparent_100%)]" />
+  </div>
 );
 
 export default function App() {
   const [isAdminOpen, setIsAdminOpen] = useState(false);
-  const [state, setState] = useState<AppState>(() => {
-    try {
-      const saved = localStorage.getItem('ai_economics_v6_restored');
-      if (saved) return JSON.parse(saved);
-    } catch (e) { console.error(e); }
-    return { config: DEFAULT_CONFIG, profile: INITIAL_PROFILE };
-  });
+  const [state, setState] = useState<AppState | null>(null);
 
   useEffect(() => {
-    localStorage.setItem('ai_economics_v6_restored', JSON.stringify(state));
+    // LocalStorage 접근 시 보안 오류 방지
+    try {
+      const saved = localStorage.getItem('ai_economics_v6_restored');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.config && parsed.profile) {
+          setState({
+            config: { ...DEFAULT_CONFIG, ...parsed.config },
+            profile: { ...INITIAL_PROFILE, ...parsed.profile }
+          });
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn("LocalStorage access denied or corrupted. Using defaults.", e);
+    }
+    setState({ config: DEFAULT_CONFIG, profile: INITIAL_PROFILE });
+  }, []);
+
+  useEffect(() => {
+    if (state) {
+      try {
+        localStorage.setItem('ai_economics_v6_restored', JSON.stringify(state));
+      } catch (e) {
+        // LocalStorage 쓰기 제한 시 무시
+      }
+    }
   }, [state]);
 
-  const updateConfig = (newConfig: SiteConfig) => setState(prev => ({ ...prev, config: newConfig }));
-  const updateProfile = (newProfile: Profile) => setState(prev => ({ ...prev, profile: newProfile }));
+  if (!state) return null;
+
+  const updateConfig = (newConfig: Partial<SiteConfig>) => 
+    setState(prev => prev ? ({ ...prev, config: { ...prev.config, ...newConfig } }) : null);
+  
+  const updateProfile = (newProfile: Partial<Profile>) => 
+    setState(prev => prev ? ({ ...prev, profile: { ...prev.profile, ...newProfile } }) : null);
 
   return (
     <Router>
       <ScrollToTop />
-      <div className="min-h-screen bg-[#020205] selection:bg-indigo-500/30">
+      <div className="min-h-screen bg-[#020205] selection:bg-indigo-500/30 text-white relative font-sans">
+        <BackgroundLayer />
         <Navbar siteName={state.config?.siteName} onAdminToggle={() => setIsAdminOpen(!isAdminOpen)} />
         {isAdminOpen && <AdminDashboard state={state} onUpdateConfig={updateConfig} onUpdateProfile={updateProfile} />}
         <Routes>
