@@ -17,8 +17,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ state, onUpdateConfig, 
 
   const handleAiEnhanceBio = async () => {
     setIsAiLoading(true);
-    const result = await gemini.generateDraft(`Professionalize and enhance this bio for an AI Economics consultant: ${state.profile.bio}`);
-    if (result) onUpdateProfile({ ...state.profile, bio: result.content });
+    // AI는 오직 텍스트 바이오만 처리하도록 프롬프트 구성
+    const result = await gemini.generateDraft(`Professionalize and enhance this bio text for an AI Economics consultant, maintaining the existing professional tone and facts: ${state.profile.bio}`);
+    if (result) {
+      // 이미지(imageUrl)는 유지하고 bio 텍스트만 업데이트
+      onUpdateProfile({ ...state.profile, bio: result.content });
+    }
     setIsAiLoading(false);
   };
 
@@ -29,7 +33,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ state, onUpdateConfig, 
       reader.onload = (e) => {
         const img = new Image();
         img.onload = () => {
-          const MAX_WIDTH = 800;
+          const MAX_WIDTH = 1200;
           let width = img.width;
           let height = img.height;
           if (width > MAX_WIDTH) {
@@ -41,7 +45,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ state, onUpdateConfig, 
           const ctx = canvas.getContext('2d');
           if (ctx) {
             ctx.drawImage(img, 0, 0, width, height);
-            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.85);
             onUpdateProfile({ ...state.profile, imageUrl: compressedBase64 });
           }
         };
@@ -75,17 +79,17 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ state, onUpdateConfig, 
         {activeTab === 'profile' ? (
           <div className="space-y-8 animate-in fade-in duration-500">
             <Card className="p-8 space-y-6">
-              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-500">Visual Identity</h3>
+              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-500">Visual Identity (Manual Upload Only)</h3>
               <div className="flex flex-col md:flex-row gap-6 items-center">
                 <div className="relative group">
-                  <div className="w-32 h-32 bg-zinc-800 rounded-xl overflow-hidden border border-white/10 shadow-xl">
-                    <img src={state.profile.imageUrl} className="w-full h-full object-cover transition-opacity group-hover:opacity-50" />
+                  <div className="w-40 h-48 bg-zinc-800 rounded-xl overflow-hidden border border-white/10 shadow-xl">
+                    <img src={state.profile.imageUrl} className="w-full h-full object-cover transition-opacity group-hover:opacity-50" alt="Profile" />
                   </div>
                   <button 
                     onClick={() => fileInputRef.current?.click()} 
-                    className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 text-[10px] font-bold text-white uppercase tracking-widest"
+                    className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 text-[10px] font-bold text-white uppercase tracking-widest bg-black/40"
                   >
-                    Change Photo
+                    Upload Your Photo
                   </button>
                   <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileUpload} />
                 </div>
@@ -96,8 +100,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ state, onUpdateConfig, 
               </div>
               <TextArea label="Professional Biography" value={state.profile.bio} onChange={(e) => onUpdateProfile({...state.profile, bio: e.target.value})} />
               <Button onClick={handleAiEnhanceBio} disabled={isAiLoading} variant="outline" className="w-full text-[10px] border-indigo-500/30">
-                {isAiLoading ? "Syncing with Gemini..." : "Enhance Narrative with AI ✨"}
+                {isAiLoading ? "Processing Text with Gemini..." : "Professionalize Bio Text with AI ✨"}
               </Button>
+              <p className="text-[9px] text-gray-600 uppercase tracking-widest text-center italic">AI only enhances your written biography. Your uploaded photo remains untouched.</p>
             </Card>
           </div>
         ) : (
