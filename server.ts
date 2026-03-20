@@ -192,9 +192,9 @@ async function startServer() {
     }
   });
 
-  // --- Vite Middleware ---
-  
+  // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
+    const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
@@ -202,10 +202,16 @@ async function startServer() {
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), 'dist');
-    app.use(express.static(distPath));
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
-    });
+    if (fs.existsSync(distPath)) {
+      app.use(express.static(distPath));
+      app.get('*', (req, res) => {
+        res.sendFile(path.join(distPath, 'index.html'));
+      });
+    } else {
+      app.get('*', (req, res) => {
+        res.send("Application is building or 'dist' folder is missing. Please check Vercel build logs.");
+      });
+    }
   }
 
   app.listen(PORT, "0.0.0.0", () => {
