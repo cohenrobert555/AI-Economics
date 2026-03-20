@@ -10,9 +10,9 @@ export const FONTS = [
 ];
 
 export const DEFAULT_CONFIG: SiteConfig = {
-  siteName: "AI Economics LLC",
+  siteName: "AI Economics",
   tagline: "ROI of Intelligent Systems",
-  heroHeading: "The ROI of Intelligent Systems",
+  heroHeading: "Empowering Decisions Through AI-Driven Economic Mastery",
   heroSubheading: "Analyzing the ROI of investments in AI models and Multiagent Systems with precision-engineered strategic consulting.",
   primaryColor: "#4F46E5",
   accentColor: "#7C3AED",
@@ -55,47 +55,6 @@ export const INITIAL_PROFILE: Profile = {
     {
       title: "Direct Contact",
       content: "For further information, please contact Dr. Robert Cohen, CEO of AI Economics LLC, at info@aieconomics.ai"
-    }
-  ],
-  stats: [
-    { label: "ROI Accuracy", value: "98%", description: "Precision in economic forecasting and value realization." },
-    { label: "Satisfaction", value: "100%", description: "Unparalleled client success in strategic AI deployment." },
-    { label: "Implementations", value: "50+", description: "Successful enterprise-scale AI model integrations." },
-    { label: "Value Quantified", value: "$2B+", description: "Total economic impact identified for global clients." }
-  ],
-  strategicOps: [
-    { 
-      title: "Enterprise Scale Impact Analysis", 
-      description: "Deep-dive evaluation of how AI models transform organizational efficiency and market positioning.",
-      impact: "35% Operational Efficiency Gain"
-    },
-    { 
-      title: "Value Creation & Capture", 
-      description: "Strategic frameworks for identifying and securing competitive advantages through Multiagent Systems.",
-      impact: "2.5x Average ROI"
-    }
-  ],
-  researchReports: [
-    {
-      id: "welding-inspection",
-      title: "AI in Welding Inspection",
-      summary: "Economic analysis of automated quality control in heavy manufacturing.",
-      fullContent: "This report details the ROI of implementing computer vision and AI models in welding inspection processes. By reducing manual oversight and increasing accuracy, enterprises can capture significant cost savings and improve structural integrity across production lines.",
-      tags: ["Manufacturing", "Computer Vision", "ROI"]
-    },
-    {
-      id: "capital-allocation",
-      title: "Strategic Capital Allocation",
-      summary: "Frameworks for prioritizing AI investments in volatile markets.",
-      fullContent: "A comprehensive guide to allocating capital towards AI initiatives. This research explores how multiagent systems can optimize investment portfolios and resource distribution to maximize long-term economic value.",
-      tags: ["Finance", "Strategy", "Investment"]
-    },
-    {
-      id: "digital-labor",
-      title: "The Economics of Digital Labor",
-      summary: "Impact assessment of multiagent systems on workforce productivity.",
-      fullContent: "Exploring the shift from traditional labor to digital agents. This model quantifies the productivity gains and economic shifts resulting from the integration of autonomous AI agents into enterprise workflows.",
-      tags: ["Labor Economics", "Multiagent Systems", "Productivity"]
     }
   ]
 };

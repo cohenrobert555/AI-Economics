@@ -1,0 +1,90 @@
+{
+  "entities": {
+    "insight": {
+      "title": "Economic Insight",
+      "description": "A luxury economic insight published by the AI Economics consultancy.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "The title of the insight." },
+        "content": { "type": "string", "description": "The full content of the insight (Markdown)." },
+        "summary": { "type": "string", "description": "A brief summary of the insight." },
+        "category": { "type": "string", "description": "The category of the insight (e.g., Macro, AI, Finance)." },
+        "authorId": { "type": "string", "description": "The UID of the author." },
+        "authorName": { "type": "string", "description": "The name of the author." },
+        "publishedAt": { "type": "string", "format": "date-time", "description": "The date and time the insight was published." },
+        "imageUrl": { "type": "string", "description": "A URL to a featured image." },
+        "isPremium": { "type": "boolean", "description": "Whether the insight is for premium clients only." }
+      },
+      "required": ["title", "content", "summary", "category", "authorId", "publishedAt"]
+    },
+    "user": {
+      "title": "User Profile",
+      "description": "User profile for admins and clients.",
+      "type": "object",
+      "properties": {
+        "displayName": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "client"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["displayName", "email", "role", "createdAt"]
+    },
+    "siteSettings": {
+      "title": "Site Settings",
+      "description": "Editable content and configuration for the landing page.",
+      "type": "object",
+      "properties": {
+        "heroKicker": { "type": "string" },
+        "heroTitle": { "type": "string" },
+        "heroSubtitle": { "type": "string" },
+        "heroImage": { "type": "string" },
+        "opsTitle": { "type": "string" },
+        "opsDesc": { "type": "string" },
+        "opsImage": { "type": "string" },
+        "opsCards": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": { "type": "string" },
+              "desc": { "type": "string" },
+              "image": { "type": "string" }
+            }
+          }
+        },
+        "ceoName": { "type": "string" },
+        "ceoTitle": { "type": "string" },
+        "ceoBio": { "type": "string" },
+        "ceoImage": { "type": "string" },
+        "inquiryTitle": { "type": "string" },
+        "inquirySubtitle": { "type": "string" },
+        "primaryFont": { "type": "string" },
+        "serifFont": { "type": "string" },
+        "stats": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "value": { "type": "string" },
+              "label": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "firestore": {
+    "/insights/{insightId}": {
+      "schema": "insight",
+      "description": "Collection of economic insights."
+    },
+    "/users/{userId}": {
+      "schema": "user",
+      "description": "User profiles and roles."
+    },
+    "/settings/content": {
+      "schema": "siteSettings",
+      "description": "Global site content settings."
+    }
+  }
+}

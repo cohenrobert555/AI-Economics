@@ -4,26 +4,6 @@ export interface Skill {
   level: number; // 0-100
 }
 
-export interface Stat {
-  label: string;
-  value: string;
-  description: string;
-}
-
-export interface StrategicOp {
-  title: string;
-  description: string;
-  impact: string;
-}
-
-export interface ResearchReport {
-  id: string;
-  title: string;
-  summary: string;
-  fullContent: string;
-  tags: string[];
-}
-
 export interface Profile {
   name: string;
   title: string;
@@ -31,9 +11,6 @@ export interface Profile {
   imageUrl: string;
   skills: Skill[];
   achievements: string[];
-  stats: Stat[];
-  strategicOps: StrategicOp[];
-  researchReports: ResearchReport[];
   detailedSections: {
     title: string;
     content: string;

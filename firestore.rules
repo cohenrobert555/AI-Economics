@@ -1,0 +1,109 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: insights
+    // Document ID: auto-generated
+    // Fields:
+    //   - title: string (required)
+    //   - content: string (required)
+    //   - summary: string (required)
+    //   - category: string (required)
+    //   - authorId: string (required)
+    //   - authorName: string (required)
+    //   - publishedAt: timestamp (required)
+    //   - imageUrl: string (optional)
+    //   - isPremium: bool (optional)
+    //
+    // Collection: users
+    // Document ID: userId (uid)
+    // Fields:
+    //   - displayName: string (required)
+    //   - email: string (required)
+    //   - role: string (required, 'admin' or 'client')
+    //   - createdAt: timestamp (required)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+          (request.auth.token.email == "cohenrobert555@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+    function isValidInsight(data) {
+      return hasRequiredFields(['title', 'content', 'summary', 'category', 'authorId', 'publishedAt']) &&
+             data.title is string && data.title.size() > 0 && data.title.size() < 200 &&
+             data.content is string && data.content.size() > 0 && data.content.size() < 50000 &&
+             data.summary is string && data.summary.size() > 0 && data.summary.size() < 1000 &&
+             data.category is string && data.category.size() > 0 && data.category.size() < 50 &&
+             data.authorId is string &&
+             data.publishedAt is timestamp;
+    }
+
+    function isValidUser(data) {
+      return hasRequiredFields(['displayName', 'email', 'role', 'createdAt']) &&
+             data.displayName is string && data.displayName.size() > 0 && data.displayName.size() < 100 &&
+             data.email is string && data.email.size() > 0 && data.email.size() < 100 &&
+             data.role in ['admin', 'client'] &&
+             data.createdAt is timestamp;
+    }
+
+    // ===============================================================
+    // Match Rules
+    // ===============================================================
+
+    match /insights/{insightId} {
+      // Publicly readable
+      allow read: if true;
+      // Only admins can write
+      allow create: if isAdmin() && isValidInsight(request.resource.data);
+      allow update: if isAdmin() && isValidInsight(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /users/{userId} {
+      // Users can read their own profile, admins can read all
+      allow read: if isOwner(userId) || isAdmin();
+      // Users can create their own profile as 'client' by default
+      // Only admins can create/update roles to 'admin'
+      allow create: if isAuthenticated() && isOwner(userId) && isValidUser(request.resource.data) &&
+                    (request.resource.data.role == 'client' || isAdmin());
+      allow update: if isAuthenticated() && (isOwner(userId) || isAdmin()) && isValidUser(request.resource.data) &&
+                    (request.resource.data.role == resource.data.role || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    match /settings/content {
+      // Publicly readable
+      allow read: if true;
+      // Only admins can write
+      allow write: if isAdmin();
+    }
+  }
+}
